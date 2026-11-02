@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GTA VI Countdown</title>
+<meta name="description" content="Live countdown to Grand Theft Auto VI. Thursday 19 November 2026. Welcome to Leonida.">
+<meta property="og:title" content="GTA VI Countdown">
+<meta property="og:description" content="Live countdown to Grand Theft Auto VI. Thursday 19 November 2026.">
+<meta name="theme-color" content="#0b0418">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500&family=Yellowtail&display=swap">
+<style>
+/* Layout: one full-bleed Leonida sunset scene (canvas) with a centered poster lockup, HUD pinned to corners, news ticker pinned to the bottom. */
+:root{
+  --night:#0b0418;
+  --plum:#2a0a4a;
+  --magenta:#ff2e88;
+  --flamingo:#ff8cc2;
+  --sunset:#ff8a3d;
+  --gold:#ffd166;
+  --aqua:#2de2e6;
+  --cash:#8dff9e;
+  --blood:#e0102a;
+  --ink:#fff4fb;
+  --display:'Anton', Impact, 'Arial Narrow Bold', sans-serif;
+  --script:'Yellowtail', 'Brush Script MT', cursive;
+  --hud:'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --beat:0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--night);color:var(--ink);font-family:var(--hud);
+  min-height:100svh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--aqua);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- scene + overlays ---------- */
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;transition:filter .8s}
+.fx{position:fixed;inset:0;pointer-events:none;z-index:1}
+.fx.scan{background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);opacity:.55}
+.fx.vig{background:radial-gradient(120% 90% at 50% 42%,transparent 50%,rgba(5,0,12,.8))}
+.fx.siren{z-index:6;opacity:0}
+body.wanted5 .fx.siren{animation:siren .5s linear infinite}
+@keyframes siren{
+  0%,49%{opacity:1;box-shadow:inset 0 0 180px 40px rgba(255,20,50,.75)}
+  50%,100%{opacity:1;box-shadow:inset 0 0 180px 40px rgba(30,90,255,.75)}
+}
+body.vice #scene{filter:hue-rotate(155deg) saturate(1.35)}
+body.vice .vi{filter:hue-rotate(155deg) drop-shadow(0 0 30px rgba(45,226,230,.55)) drop-shadow(6px 8px 0 rgba(10,0,25,.6))}
+
+/* ---------- HUD ---------- */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:5;pointer-events:none;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding-top:max(14px,env(safe-area-inset-top,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.hud-left{display:grid;gap:2px}
+.hud-time{font-family:var(--display);font-size:clamp(1.3rem,3vw,1.9rem);letter-spacing:.04em;text-shadow:2px 2px 0 #000;font-variant-numeric:tabular-nums}
+.hud-loc{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--flamingo);text-shadow:1px 1px 0 #000}
+.hud-right{display:grid;justify-items:end;gap:4px}
+.money{font-family:var(--display);font-size:clamp(1.5rem,3.8vw,2.4rem);color:var(--cash);letter-spacing:.02em;font-variant-numeric:tabular-nums;text-shadow:2px 2px 0 #000,0 0 18px rgba(141,255,158,.35)}
+.wanted{display:flex;gap:3px}
+.wanted svg{width:clamp(18px,3vw,26px);height:auto;overflow:visible}
+.wanted path{fill:rgba(255,255,255,.08);stroke:rgba(255,255,255,.75);stroke-width:1.6;stroke-linejoin:round;filter:drop-shadow(1px 1px 0 #000)}
+.wanted .on path{fill:#fff}
+.wanted .flash path{animation:starflash .45s steps(2) infinite}
+@keyframes starflash{0%{fill:#fff}50%{fill:rgba(255,255,255,.08)}}
+
+/* ---------- main poster ---------- */
+main{
+  position:relative;z-index:2;min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(16px,2.6vh,30px);text-align:center;
+  padding-block:clamp(88px,12vh,120px) clamp(96px,13vh,140px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.logo{margin:0;display:grid;justify-items:center;position:relative;line-height:.82;font-weight:400}
+.logo .gta{
+  font-family:var(--display);font-size:clamp(.95rem,2.4vw,1.5rem);letter-spacing:.55em;padding-left:.55em;
+  text-transform:uppercase;color:#fff;text-shadow:0 0 14px rgba(255,46,136,.9),2px 2px 0 rgba(0,0,0,.6);
+}
+.vi{
+  font-family:var(--display);font-size:clamp(8.5rem,31vw,21rem);letter-spacing:-.01em;
+  position:relative;display:inline-block;padding:0 .06em;
+  background:linear-gradient(176deg,#fff8cf 0%,var(--gold) 20%,var(--sunset) 42%,var(--magenta) 66%,#8b2fd6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 30px rgba(255,46,136,.55)) drop-shadow(6px 8px 0 rgba(10,0,25,.6));
+  transform:scale(calc(1 + var(--beat) * .035));transition:filter .8s;
+}
+.vi::before,.vi::after{
+  content:attr(data-text);position:absolute;inset:0;padding:0 .06em;
+  -webkit-background-clip:border-box;background:none;opacity:0;mix-blend-mode:screen;
+}
+.vi::before{color:var(--aqua);animation:glitchA 4.2s infinite steps(1)}
+.vi::after{color:var(--magenta);animation:glitchB 4.2s infinite steps(1)}
+@keyframes glitchA{
+  0%,86%,100%{opacity:0;transform:none;clip-path:inset(0)}
+  87%{opacity:.9;transform:translate(-7px,2px);clip-path:inset(12% 0 62% 0)}
+  89%{opacity:.9;transform:translate(9px,-3px);clip-path:inset(55% 0 20% 0)}
+  91%{opacity:.9;transform:translate(-4px,0);clip-path:inset(30% 0 45% 0)}
+  93%{opacity:0}
+}
+@keyframes glitchB{
+  0%,87%,100%{opacity:0;transform:none;clip-path:inset(0)}
+  88%{opacity:.85;transform:translate(8px,-2px);clip-path:inset(68% 0 8% 0)}
+  90%{opacity:.85;transform:translate(-10px,3px);clip-path:inset(4% 0 70% 0)}
+  92%{opacity:.85;transform:translate(5px,0);clip-path:inset(40% 0 38% 0)}
+  94%{opacity:0}
+}
+.logo .script{
+  font-family:var(--script);font-size:clamp(2.6rem,8.5vw,6rem);line-height:1;color:#fff;
+  position:absolute;right:-6%;bottom:2%;transform:rotate(-9deg);
+  text-shadow:0 0 6px #fff,0 0 18px var(--magenta),0 0 42px var(--magenta),3px 3px 0 rgba(60,0,40,.6);
+  animation:neon 6s infinite;
+}
+@keyframes neon{0%,40%,44%,46%,100%{opacity:1}42%,45%{opacity:.35}}
+
+.when{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin:0;
+  font-weight:700;font-size:clamp(.72rem,1.8vw,.95rem);letter-spacing:.28em;text-transform:uppercase;
+}
+.when span{padding:.35em .8em;background:rgba(11,4,24,.55);border:1px solid rgba(255,140,194,.35);backdrop-filter:blur(4px)}
+.when .date{color:var(--gold);border-color:rgba(255,209,102,.6)}
+
+/* ---------- clock ---------- */
+.clock{display:flex;align-items:flex-start;justify-content:center;gap:clamp(6px,1.4vw,18px)}
+.unit{display:grid;justify-items:center;gap:8px}
+.face{
+  display:flex;font-family:var(--display);font-size:clamp(2.9rem,11.5vw,8.4rem);line-height:1;
+  padding:.1em .16em;position:relative;
+  background:linear-gradient(180deg,rgba(26,6,48,.82),rgba(52,8,70,.6));
+  border:2px solid rgba(255,140,194,.55);
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 34px rgba(255,46,136,.35),inset 0 0 26px rgba(255,46,136,.2);
+  transform:skewX(-8deg);backdrop-filter:blur(6px);
+}
+.face::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(11,4,24,.65)}
+.roll{display:block;height:1em;width:.56em;overflow:hidden}
+.strip{display:flex;flex-direction:column;transition:transform .75s cubic-bezier(.2,1.45,.35,1)}
+.strip span{
+  display:block;height:1em;text-align:center;
+  background:linear-gradient(180deg,#fff 0%,#ffe2f0 55%,var(--flamingo) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.label{font-weight:700;font-size:clamp(.6rem,1.5vw,.82rem);letter-spacing:.38em;padding-left:.38em;text-transform:uppercase;color:var(--flamingo);text-shadow:1px 1px 0 #000}
+.sep{font-family:var(--display);font-size:clamp(2rem,7vw,5.6rem);line-height:1.3;color:var(--magenta);text-shadow:0 0 18px var(--magenta);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.15}}
+
+.tally{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;margin:0;
+  font-family:var(--mono);font-size:clamp(.7rem,1.7vw,.88rem);color:rgba(255,244,251,.82);font-variant-numeric:tabular-nums;
+}
+.tally b{color:var(--aqua);font-weight:500}
+.tally .ms b{color:var(--gold)}
+
+/* ---------- hype meter ---------- */
+.meter{width:min(640px,100%);display:grid;gap:8px;text-align:left}
+.meter-head,.meter-foot{display:flex;justify-content:space-between;gap:12px}
+.meter-head{font-weight:700;font-size:.8rem;letter-spacing:.3em;text-transform:uppercase}
+.meter-head output{font-family:var(--mono);letter-spacing:0;color:var(--gold);font-variant-numeric:tabular-nums}
+.meter-foot{font-family:var(--mono);font-size:.68rem;color:rgba(255,244,251,.78)}
+.bar{height:14px;background:rgba(11,4,24,.7);border:1px solid rgba(255,140,194,.45);padding:2px;transform:skewX(-14deg)}
+.bar i{
+  display:block;height:100%;width:0;
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.22) 0 6px,transparent 6px 12px),linear-gradient(90deg,var(--gold),var(--sunset),var(--magenta));
+  background-size:24px 24px,100% 100%;animation:stripes .6s linear infinite;box-shadow:0 0 16px rgba(255,46,136,.6);
+}
+@keyframes stripes{to{background-position:24px 0,0 0}}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.btn{
+  cursor:pointer;border:0;padding:.85em 1.4em;font-weight:700;font-size:.82rem;letter-spacing:.22em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--magenta),var(--sunset));color:#1a0420;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:transform .15s,filter .15s;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.btn.ghost{background:rgba(11,4,24,.65);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(255,140,194,.6)}
+.btn[aria-pressed="true"]{background:linear-gradient(90deg,var(--aqua),#8b2fd6);color:#05010d}
+
+.cheats{width:min(640px,100%);font-size:.8rem}
+.cheats summary{cursor:pointer;list-style:none;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,244,251,.85);padding:6px}
+.cheats summary::-webkit-details-marker{display:none}
+.cheats summary::before{content:"▸ ";color:var(--magenta)}
+.cheats[open] summary::before{content:"▾ "}
+.cheat-list{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding-top:8px}
+.cheat-list button{
+  cursor:pointer;border:1px solid rgba(45,226,230,.5);background:rgba(11,4,24,.7);
+  padding:.5em .8em;font-family:var(--mono);font-size:.74rem;color:var(--aqua);text-align:left;
+}
+.cheat-list button small{display:block;color:rgba(255,244,251,.78);font-family:var(--hud);font-size:.66rem;letter-spacing:.06em}
+.cheat-list button:hover{background:rgba(45,226,230,.12)}
+.fine{margin:0;max-width:60ch;font-size:.68rem;line-height:1.5;color:rgba(255,244,251,.72)}
+
+/* ---------- ticker ---------- */
+.ticker{
+  position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:stretch;
+  background:rgba(8,2,18,.88);border-top:2px solid var(--magenta);backdrop-filter:blur(6px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.ticker .tag{
+  flex:none;display:flex;align-items:center;padding:.55em max(14px,env(safe-area-inset-left,0px));padding-right:1.1em;
+  font-family:var(--display);font-size:1rem;letter-spacing:.08em;background:var(--magenta);color:#fff;
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);
+}
+.ticker .tag em{font-style:normal;color:#1a0420;margin-left:.35em}
+.track{overflow:hidden;flex:1;min-width:0;display:flex;align-items:center;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.track-inner{display:flex;white-space:nowrap;animation:marquee 70s linear infinite;font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+.track-inner span{padding:0 1.4em}
+.track-inner span::after{content:"◆";color:var(--magenta);margin-left:2.8em}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- toast + overlays ---------- */
+.toast{
+  position:fixed;z-index:20;left:50%;top:max(84px,calc(env(safe-area-inset-top,0px) + 70px));
+  transform:translate(-50%,-20px);opacity:0;pointer-events:none;transition:all .3s;
+  background:rgba(5,1,12,.92);border-left:4px solid var(--aqua);padding:.8em 1.2em;max-width:calc(100% - 32px);
+  font-family:var(--mono);font-size:.85rem;text-align:left;
+}
+.toast b{display:block;font-family:var(--hud);letter-spacing:.3em;font-size:.72rem;color:var(--aqua)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.overlay{
+  position:fixed;inset:0;z-index:30;display:grid;place-items:center;align-content:center;gap:10px;text-align:center;
+  pointer-events:none;opacity:0;transition:opacity .4s;
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.wasted{backdrop-filter:grayscale(1) contrast(1.15) brightness(.8);-webkit-backdrop-filter:grayscale(1) contrast(1.15) brightness(.8);background:rgba(0,0,0,.25)}
+.wasted h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(4rem,16vw,11rem);letter-spacing:.06em;color:var(--blood);text-shadow:4px 4px 0 #000}
+.wasted.show h2{animation:slam 3s ease-out both}
+@keyframes slam{0%{transform:scale(2.4);opacity:0}12%{transform:scale(1);opacity:1}100%{transform:scale(1.08)}}
+.passed{background:radial-gradient(circle,rgba(11,4,24,.55),rgba(11,4,24,.85))}
+.passed h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(3rem,11vw,8rem);line-height:.95;color:var(--gold);text-shadow:4px 4px 0 #000}
+.passed p{margin:0;font-weight:700;letter-spacing:.3em;text-transform:uppercase}
+.passed .respect{font-family:var(--display);letter-spacing:.08em;font-size:1.6rem;color:#fff}
+
+.intro{
+  position:fixed;inset:0;z-index:60;background:var(--night);display:grid;place-items:center;align-content:center;gap:22px;
+  transition:clip-path 1s cubic-bezier(.7,0,.2,1);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);cursor:pointer;
+}
+.intro.gone{clip-path:polygon(100% 0,100% 0,100% 100%,100% 100%)}
+.intro .script{font-family:var(--script);font-size:clamp(3.5rem,14vw,8rem);color:#fff;text-shadow:0 0 22px var(--magenta),0 0 50px var(--magenta)}
+.intro .load{width:min(280px,70vw);height:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.intro .load i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--magenta));transform-origin:left;animation:load 1.7s cubic-bezier(.6,0,.3,1) both}
+.intro small{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;color:rgba(255,244,251,.78)}
+@keyframes load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+@media (max-width:560px){
+  .sep{display:none}
+  .logo .script{right:-2%}
+  .hud-loc{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .intro{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="fx scan"></div>
+<div class="fx vig"></div>
+<div class="fx siren"></div>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="script">Leonida</div>
+  <div class="load"><i></i></div>
+  <small>LOADING STATE OF LEONIDA…</small>
+</div>
+
+<header class="hud" aria-hidden="true">
+  <div class="hud-left">
+    <div class="hud-time" id="hudTime">00:00</div>
+    <div class="hud-loc">Vice City · Leonida</div>
+  </div>
+  <div class="hud-right">
+    <div class="money" id="money">$0</div>
+    <div class="wanted" id="wanted"></div>
+  </div>
+</header>
+
+<main>
+  <h1 class="logo">
+    <span class="gta">Grand Theft Auto</span>
+    <span class="vi" data-text="VI">VI</span>
+    <span class="script" aria-hidden="true">Leonida</span>
+  </h1>
+
+  <p class="when">
+    <span class="date">Thu · 19 Nov 2026</span>
+    <span>PS5</span>
+    <span>Xbox Series X|S</span>
+  </p>
+
+  <div class="clock" id="clock" role="timer" aria-label="Time left until Grand Theft Auto VI">
+    <div class="unit"><div class="face" id="u-d"></div><div class="label">Days</div></div>
+    <div class="sep" aria-hidden="true">:</div>
+    <div class="unit"><div class="face" id="u-h"></div><div class="label">Hours</div></div>
+    <div class="sep" aria-hidden="true">:</div>
+    <div class="unit"><div class="face" id="u-m"></div><div class="label">Mins</div></div>
+    <div class="sep" aria-hidden="true">:</div>
+    <div class="unit"><div class="face" id="u-s"></div><div class="label">Secs</div></div>
+  </div>
+  <p class="sr" id="srText" aria-live="polite"></p>
+
+  <p class="tally">
+    <span class="ms"><b id="ms">000</b> ms</span>
+    <span><b id="secs">0</b> seconds</span>
+    <span><b id="weeks">0</b> weeks</span>
+    <span><b id="sleeps">0</b> sleeps</span>
+  </p>
+
+  <section class="meter" aria-label="Hype meter">
+    <div class="meter-head"><span>Hype loading</span><output id="pct">0%</output></div>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="meter-foot"><span>Trailer 1 · 5 Dec 2023</span><span>Launch · 19 Nov 2026</span></div>
+  </section>
+
+  <div class="controls">
+    <button class="btn" id="radio" aria-pressed="false">Tune in · Leonida FM</button>
+    <button class="btn ghost" id="share">Copy link</button>
+  </div>
+
+  <details class="cheats">
+    <summary>Cheat sheet</summary>
+    <div class="cheat-list">
+      <button data-cheat="HESOYAM">HESOYAM<small>+$250,000</small></button>
+      <button data-cheat="VICE">VICE<small>Flip the palette</small></button>
+      <button data-cheat="SKYFALL">SKYFALL<small>Hyperdrive</small></button>
+      <button data-cheat="LEONIDA">LEONIDA<small>Fireworks</small></button>
+      <button data-cheat="KONAMI">↑↑↓↓←→←→BA<small>Five stars</small></button>
+      <button data-cheat="WASTED">WASTED<small>You know</small></button>
+    </div>
+  </details>
+
+  <p class="fine">Fan-made countdown. Not affiliated with Rockstar Games or Take-Two Interactive. Counts down to midnight on 19 November 2026 in your own time zone. Type the cheats on a keyboard or tap them above.</p>
+</main>
+
+<div class="ticker" aria-label="Weazel News headlines">
+  <div class="tag">WEAZEL<em>NEWS</em></div>
+  <div class="track"><div class="track-inner" id="track"></div></div>
+</div>
+
+<div class="toast" id="toast" role="status"><b id="toastHead">CHEAT ACTIVATED</b><span id="toastBody"></span></div>
+<div class="overlay wasted" id="wastedOv" aria-hidden="true"><h2>WASTED</h2></div>
+<div class="overlay passed" id="passedOv" aria-hidden="true">
+  <h2>Mission<br>Passed</h2>
+  <p class="respect">RESPECT +</p>
+  <p>GTA VI is out. Go to Leonida.</p>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const RELEASE = new Date(2026, 10, 19, 0, 0, 0);   // local midnight, 19 Nov 2026
+  const TRAILER = new Date(2023, 11, 5, 9, 0, 0);    // Trailer 1 drop
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const root = document.documentElement;
+
+  /* ================= Countdown ================= */
+  const faces = { d: $('#u-d'), h: $('#u-h'), m: $('#u-m'), s: $('#u-s') };
+
+  function buildRoller(face, n) {
+    face.textContent = '';
+    for (let i = 0; i < n; i++) {
+      const roll = document.createElement('span'); roll.className = 'roll';
+      const strip = document.createElement('span'); strip.className = 'strip';
+      for (let d = 0; d < 10; d++) { const x = document.createElement('span'); x.textContent = d; strip.appendChild(x); }
+      roll.appendChild(strip); face.appendChild(roll);
+    }
+    face._last = '';
+  }
+  function setRoller(face, str) {
+    if (face.children.length !== str.length) buildRoller(face, str.length);
+    if (face._last === str) return;
+    [...face.children].forEach((r, i) => { r.firstChild.style.transform = `translateY(${-Number(str[i])}em)`; });
+    face._last = str;
+  }
+
+  const msEl = $('#ms'), secsEl = $('#secs'), weeksEl = $('#weeks'), sleepsEl = $('#sleeps');
+  const pctEl = $('#pct'), fillEl = $('#fill'), srEl = $('#srText'), hudTime = $('#hudTime');
+  let launched = false, lastMinute = -1;
+
+  function countdown(now) {
+    let diff = RELEASE - now;
+    if (diff <= 0) { diff = 0; if (!launched) launch(); }
+    const d = Math.floor(diff / 864e5), h = Math.floor(diff / 36e5) % 24,
+          m = Math.floor(diff / 6e4) % 60, s = Math.floor(diff / 1e3) % 60;
+    setRoller(faces.d, String(d).padStart(2, '0'));
+    setRoller(faces.h, String(h).padStart(2, '0'));
+    setRoller(faces.m, String(m).padStart(2, '0'));
+    setRoller(faces.s, String(s).padStart(2, '0'));
+    msEl.textContent = String(diff % 1000).padStart(3, '0');
+    secsEl.textContent = Math.floor(diff / 1000).toLocaleString('en-US');
+    weeksEl.textContent = (diff / 6048e5).toFixed(3);
+    const today = new Date(now); today.setHours(0, 0, 0, 0);
+    sleepsEl.textContent = Math.max(0, Math.round((RELEASE - today) / 864e5));
+
+    const p = Math.min(1, Math.max(0, (now - TRAILER) / (RELEASE - TRAILER)));
+    pctEl.textContent = (p * 100).toFixed(5) + '%';
+    fillEl.style.width = (p * 100) + '%';
+    setWanted(sirens ? 5 : Math.min(5, p * 5));
+
+    const nd = new Date(now);
+    hudTime.textContent = String(nd.getHours()).padStart(2, '0') + ':' + String(nd.getMinutes()).padStart(2, '0');
+    if (m !== lastMinute) {
+      lastMinute = m;
+      srEl.textContent = diff ? `${d} days, ${h} hours and ${m} minutes until GTA VI.` : 'GTA VI is out now.';
+    }
+  }
+
+  /* ================= HUD: wanted + money ================= */
+  const wantedEl = $('#wanted');
+  const STAR = '<path d="M12 1.5l3.1 6.9 7.4.7-5.6 5 1.7 7.4L12 17.6 5.4 21.5l1.7-7.4-5.6-5 7.4-.7z"/>';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = STAR; wantedEl.appendChild(s);
+  }
+  let lastWanted = '';
+  function setWanted(level) {
+    const full = Math.floor(level), key = full + (sirens ? 's' : '');
+    if (key === lastWanted) return; lastWanted = key;
+    [...wantedEl.children].forEach((s, i) => {
+      s.classList.toggle('on', i < full);
+      s.classList.toggle('flash', sirens || i === full);
+    });
+  }
+
+  const moneyEl = $('#money');
+  const pageStart = performance.now();
+  let bonus = 0, shownMoney = 0;
+  function money(now) {
+    const target = 1_986_000 + Math.floor((now - pageStart) / 1000) * 137 + bonus;
+    shownMoney += (target - shownMoney) * 0.08;
+    if (Math.abs(target - shownMoney) < 1) shownMoney = target;
+    moneyEl.textContent = '$' + Math.round(shownMoney).toLocaleString('en-US');
+  }
+
+  /* ================= Ticker ================= */
+  const headlines = [
+    'Leonida man arrested for wrestling alligator outside gas station, says it started it',
+    'Vice City humidity reaches 140 percent, locals describe it as fine',
+    'Flamingo protest closes Vice City causeway for third day',
+    'Local influencer livestreams own arrest, gains 40k followers',
+    'Port Gellhorn mayor denies swamp is mostly crime',
+    'Grassrivers tour guide missing; alligator spotted wearing his hat',
+    'Ambrosia refinery reports record output and record smell',
+    'Leonida Keys boat parade ends in boat',
+    'Couple named Lucia and Jason wanted for questioning, police say do not approach',
+    'Mount Kalaga hikers find meth lab, rate it four stars',
+    'Breaking: someone still has not pre-ordered'
+  ];
+  const track = $('#track');
+  const html = headlines.map(h => `<span>${h}</span>`).join('');
+  track.innerHTML = html + html;
+
+  /* ================= Toast + overlays ================= */
+  const toast = $('#toast'), toastHead = $('#toastHead'), toastBody = $('#toastBody');
+  let toastTimer;
+  function say(head, body) {
+    toastHead.textContent = head; toastBody.textContent = body;
+    toast.classList.add('show'); clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+  function flashOverlay(el, ms) {
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  /* ================= Scene ================= */
+  const cv = $('#scene'), g = cv.getContext('2d');
+  let W = 0, H = 0, HZ = 0;
+  let stars = [], skyline = [], dust = [], sparks = [];
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  let warp = 1, warpTarget = 1, gridT = 0, T = 0, pulse = 0;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    HZ = Math.round(H * 0.64);
+
+    stars = Array.from({ length: Math.round(W * H / 4500) }, () => ({
+      x: rnd(-0.05, 1.05) * W, y: Math.random() * HZ * 0.75, r: rnd(0.2, 1.5), p: rnd(0, 6.28), s: rnd(0.5, 2.2)
+    }));
+
+    skyline = []; let x = -80;
+    while (x < W + 80) {
+      const w = rnd(16, 56);
+      const c = Math.abs(x / W - 0.6);
+      const hmax = H * 0.27 * (1 - Math.min(c * 1.55, 0.86));
+      const h = rnd(hmax * 0.35, hmax);
+      const b = { x, w, h, win: [], spire: Math.random() < 0.2 ? rnd(10, 42) : 0 };
+      for (let wy = 6; wy < h - 6; wy += 7)
+        for (let wx = 4; wx < w - 5; wx += 6)
+          if (Math.random() < 0.3) b.win.push([wx, wy, rnd(0, 6.28), Math.random()]);
+      skyline.push(b); x += w + rnd(-4, 3);
+    }
+    dust = Array.from({ length: 70 }, () => ({ x: Math.random() * W, y: Math.random() * H, v: rnd(6, 26), r: rnd(0.5, 2), p: rnd(0, 6.28) }));
+  }
+
+  function drawSky() {
+    const sky = g.createLinearGradient(0, 0, 0, HZ);
+    sky.addColorStop(0, '#0b0418'); sky.addColorStop(0.32, '#2a0a4a');
+    sky.addColorStop(0.6, '#7d1c78'); sky.addColorStop(0.82, '#ff2e88'); sky.addColorStop(1, '#ff8a3d');
+    g.fillStyle = sky; g.fillRect(0, 0, W, HZ);
+
+    for (const s of stars) {
+      const a = 0.35 + 0.65 * Math.abs(Math.sin(T * s.s + s.p));
+      g.globalAlpha = a * (1 - s.y / (HZ * 0.8));
+      g.fillStyle = '#fff';
+      g.fillRect(s.x + mx * -6, s.y + my * -3, s.r, s.r);
+    }
+    g.globalAlpha = 1;
+
+    // plane crossing
+    const px = ((T * 34) % (W + 400)) - 200, py = HZ * 0.18 + Math.sin(T * 0.3) * 8;
+    g.fillStyle = (Math.floor(T * 2) % 2) ? '#ff3355' : '#ffffff';
+    g.beginPath(); g.arc(px, py, 1.8, 0, 7); g.fill();
+  }
+
+  function drawSun() {
+    const R = Math.min(W * 0.3, H * 0.3);
+    const sx = W * 0.62 + mx * -22, sy = HZ - R * 0.42 + my * -6;
+    const glowR = R * (2.4 + pulse * 0.5);
+    const gr = g.createRadialGradient(sx, sy, R * 0.2, sx, sy, glowR);
+    gr.addColorStop(0, `rgba(255,140,80,${0.55 + pulse * 0.25})`); gr.addColorStop(1, 'rgba(255,46,136,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, W, HZ);
+
+    g.save();
+    g.beginPath(); g.rect(0, 0, W, HZ); g.clip();
+    // horizontal slits that scroll down
+    const top = sy - R, bot = sy + R, bandStart = sy - R * 0.08, step = R * 0.17;
+    const phase = (T * 0.22) % 1;
+    g.beginPath();
+    let cur = top;
+    for (let i = -1; i < 14; i++) {
+      const gy = bandStart + (i + phase) * step;
+      if (gy < bandStart || gy > bot) continue;
+      const gh = 1.5 + ((gy - bandStart) / (bot - bandStart)) * step * 0.6;
+      if (gy > cur) g.rect(sx - R, cur, R * 2, gy - cur);
+      cur = gy + gh;
+    }
+    if (cur < bot) g.rect(sx - R, cur, R * 2, bot - cur);
+    g.clip();
+    const sg = g.createLinearGradient(0, top, 0, bot);
+    sg.addColorStop(0, '#fff6b8'); sg.addColorStop(0.35, '#ffc65a');
+    sg.addColorStop(0.62, '#ff7a3d'); sg.addColorStop(1, '#ff2e88');
+    g.fillStyle = sg; g.beginPath(); g.arc(sx, sy, R, 0, Math.PI * 2); g.fill();
+    g.restore();
+    return { sx, R };
+  }
+
+  function drawSkyline() {
+    const ox = mx * -12;
+    for (const b of skyline) {
+      const bx = b.x + ox, by = HZ - b.h;
+      g.fillStyle = '#170629'; g.fillRect(bx, by, b.w, b.h);
+      g.fillStyle = 'rgba(255,90,140,.25)'; g.fillRect(bx, by, b.w, 1.2);
+      if (b.spire) {
+        g.fillStyle = '#170629'; g.fillRect(bx + b.w / 2 - 1, by - b.spire, 2, b.spire);
+        if (Math.sin(T * 3 + b.x) > 0.2) { g.fillStyle = '#ff2244'; g.fillRect(bx + b.w / 2 - 1.5, by - b.spire - 2, 3, 3); }
+      }
+      for (const [wx, wy, p, k] of b.win) {
+        const on = Math.sin(T * 0.25 + p) > -0.6;
+        if (!on) continue;
+        g.fillStyle = k < 0.12 ? 'rgba(45,226,230,.85)' : k < 0.22 ? 'rgba(255,120,190,.85)' : 'rgba(255,214,140,.75)';
+        g.fillRect(bx + wx, by + wy, 2.4, 3);
+      }
+    }
+  }
+
+  function drawFloor(sun) {
+    const fg = g.createLinearGradient(0, HZ, 0, H);
+    fg.addColorStop(0, '#2c0a3c'); fg.addColorStop(1, '#04010a');
+    g.fillStyle = fg; g.fillRect(0, HZ, W, H - HZ);
+
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    // sun reflection on water
+    for (let i = 0; i < 22; i++) {
+      const k = i / 22;
+      const y = HZ + 3 + Math.pow(k, 1.5) * (H - HZ) * 0.75;
+      const w = sun.R * (1.25 - k * 0.9) * (0.75 + 0.25 * Math.sin(T * 2.2 + i * 1.7));
+      g.fillStyle = `rgba(255,${Math.round(120 - k * 70)},${Math.round(90 + k * 60)},${0.32 * (1 - k)})`;
+      g.fillRect(sun.sx - w + Math.sin(T * 1.4 + i) * 6, y, w * 2, 2 + k * 3);
+    }
+    // horizon glow
+    const hg = g.createLinearGradient(0, HZ - 3, 0, HZ + 10);
+    hg.addColorStop(0, 'rgba(255,46,136,0)'); hg.addColorStop(0.3, 'rgba(255,120,190,.9)'); hg.addColorStop(1, 'rgba(255,46,136,0)');
+    g.fillStyle = hg; g.fillRect(0, HZ - 3, W, 13);
+
+    // perspective grid
+    const vpX = W * 0.5 + mx * -40;
+    const lg = g.createLinearGradient(0, HZ, 0, H);
+    lg.addColorStop(0, 'rgba(255,46,136,0)'); lg.addColorStop(0.25, 'rgba(255,46,136,.35)'); lg.addColorStop(1, 'rgba(255,90,200,.75)');
+    g.strokeStyle = lg;
+    const N = 18, off = gridT % 1;
+    g.lineWidth = 1.2; g.beginPath();
+    for (let i = 0; i < N; i++) {
+      const z = (i + off) / N, y = HZ + (H - HZ) * Math.pow(z, 2.6);
+      g.moveTo(0, y); g.lineTo(W, y);
+    }
+    for (let j = -26; j <= 26; j++) {
+      g.moveTo(vpX + j * 6, HZ); g.lineTo(vpX + j * W * 0.11, H);
+    }
+    g.stroke();
+    g.lineWidth = 4; g.globalAlpha = 0.18; g.stroke(); g.globalAlpha = 1;
+    g.restore();
+  }
+
+  function palm(bx, by, hgt, lean, sc, ph) {
+    const sway = Math.sin(T * 0.7 + ph) * 0.035 + Math.sin(T * 1.9 + ph) * 0.01;
+    g.strokeStyle = g.fillStyle = '#090212'; g.lineCap = 'round';
+    const n = 14; let px = bx, py = by;
+    for (let i = 1; i <= n; i++) {
+      const s = i / n;
+      const x = bx + (lean * s * s + sway * s * s * s) * hgt, y = by - hgt * s;
+      g.lineWidth = sc * (22 - 12 * s);
+      g.beginPath(); g.moveTo(px, py); g.lineTo(x, y); g.stroke();
+      px = x; py = y;
+    }
+    const cx = px, cy = py;
+    g.beginPath();
+    g.arc(cx - 5 * sc, cy + 7 * sc, 5.5 * sc, 0, 7); g.arc(cx + 5 * sc, cy + 8 * sc, 5.5 * sc, 0, 7); g.arc(cx, cy + 12 * sc, 5 * sc, 0, 7);
+    g.fill();
+    const F = 10;
+    for (let k = 0; k < F; k++) {
+      const a = Math.PI + (k + 0.5) / F * Math.PI + sway * 3 + Math.sin(T * 1.3 + k + ph) * 0.04;
+      const len = hgt * 0.36 * (0.82 + 0.18 * Math.sin(k * 2.3 + ph));
+      const dx = Math.cos(a), dy = Math.sin(a);
+      const ex = cx + dx * len, ey = cy + dy * len * 0.55 + len * 0.5;
+      const qx = cx + dx * len * 0.55, qy = cy + dy * len * 0.75 - len * 0.12;
+      g.lineWidth = 2.8 * sc;
+      g.beginPath(); g.moveTo(cx, cy); g.quadraticCurveTo(qx, qy, ex, ey); g.stroke();
+      g.lineWidth = 1.7 * sc; g.beginPath();
+      for (let j = 2; j <= 18; j++) {
+        const u = j / 18, iu = 1 - u;
+        const x = iu * iu * cx + 2 * iu * u * qx + u * u * ex;
+        const y = iu * iu * cy + 2 * iu * u * qy + u * u * ey;
+        const tx = 2 * iu * (qx - cx) + 2 * u * (ex - qx), ty = 2 * iu * (qy - cy) + 2 * u * (ey - qy);
+        const tl = Math.hypot(tx, ty) || 1, ux = tx / tl, uy = ty / tl, nx = -uy, ny = ux;
+        const L = len * 0.19 * Math.sin(Math.PI * Math.min(1, u * 1.08)) + 2;
+        g.moveTo(x, y); g.lineTo(x + nx * L + ux * L * 0.5, y + ny * L + L * 0.6 + uy * L * 0.5);
+        g.moveTo(x, y); g.lineTo(x - nx * L + ux * L * 0.5, y - ny * L + L * 0.6 + uy * L * 0.5);
+      }
+      g.stroke();
+    }
+  }
+
+  function drawPalms() {
+    const sc = Math.max(0.55, Math.min(1.25, H / 850));
+    const ox = mx * 28, oy = my * 8, base = H + 24;
+    palm(W * 0.86 + ox * 0.7, base + oy, H * 0.42, 0.12, sc * 0.7, 1);
+    palm(W * 0.15 + ox * 0.7, base + oy, H * 0.5, -0.08, sc * 0.8, 2);
+    palm(W * 0.04 + ox, base + oy, H * 0.8, 0.2, sc, 0);
+    palm(W * 0.97 + ox, base + oy, H * 0.72, -0.22, sc * 0.95, 4);
+  }
+
+  function drawParticles(dt) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const d of dust) {
+      d.y -= d.v * dt * warp; d.x += Math.sin(T + d.p) * 0.2;
+      if (d.y < -5) { d.y = H + 5; d.x = Math.random() * W; }
+      g.fillStyle = `rgba(255,140,200,${0.25 + 0.25 * Math.sin(T * 2 + d.p)})`;
+      g.fillRect(d.x, d.y, d.r, d.r);
+    }
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const p = sparks[i];
+      p.vy += 60 * dt; p.vx *= 0.985; p.vy *= 0.985;
+      p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+      if (p.life <= 0) { sparks.splice(i, 1); continue; }
+      g.globalAlpha = Math.min(1, p.life * 1.6);
+      g.fillStyle = p.c; g.fillRect(p.x, p.y, 2.2, 2.2);
+    }
+    g.restore();
+  }
+
+  const SPARK_COLORS = ['#ffd166', '#ff2e88', '#2de2e6', '#ff8a3d', '#ffffff', '#b46bff'];
+  function burst(x, y) {
+    const c1 = SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)];
+    const c2 = SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)];
+    for (let i = 0; i < 110; i++) {
+      const a = Math.random() * Math.PI * 2, v = rnd(40, 230);
+      sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rnd(1, 2.2), c: i % 2 ? c1 : c2 });
+    }
+  }
+  function fireworks(count) {
+    for (let i = 0; i < count; i++)
+      setTimeout(() => burst(rnd(0.15, 0.85) * W, rnd(0.1, 0.45) * H), i * 260);
+  }
+
+  /* ================= Audio: Leonida FM ================= */
+  let ac = null, master, delay, noiseBuf, playing = false, schedTimer, step = 0, nextTime = 0, startTime = 0;
+  const BPM = 100, S16 = 60 / BPM / 4;
+  const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]]; // Am F C G
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  function initAudio() {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ac.createDynamicsCompressor();
+    master = ac.createGain(); master.gain.value = 0.32;
+    master.connect(comp); comp.connect(ac.destination);
+    delay = ac.createDelay(1); delay.delayTime.value = S16 * 3;
+    const fb = ac.createGain(); fb.gain.value = 0.38;
+    const dl = ac.createGain(); dl.gain.value = 0.35;
+    delay.connect(fb); fb.connect(delay); delay.connect(dl); dl.connect(master);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  function env(node, t, a, peak, dcy) {
+    node.gain.setValueAtTime(0.0001, t);
+    node.gain.exponentialRampToValueAtTime(peak, t + a);
+    node.gain.exponentialRampToValueAtTime(0.0001, t + a + dcy);
+  }
+  function kick(t) {
+    const o = ac.createOscillator(), gn = ac.createGain();
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.15);
+    env(gn, t, 0.002, 1, 0.3); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.35);
+  }
+  function noise(t, type, freq, peak, dcy) {
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), gn = ac.createGain();
+    s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
+    env(gn, t, 0.002, peak, dcy); s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + dcy + 0.05);
+  }
+  function tone(t, midi, type, peak, dcy, cutoff, toDelay) {
+    const o = ac.createOscillator(), f = ac.createBiquadFilter(), gn = ac.createGain();
+    o.type = type; o.frequency.value = mtof(midi);
+    f.type = 'lowpass'; f.frequency.setValueAtTime(cutoff, t); f.frequency.exponentialRampToValueAtTime(cutoff * 0.3, t + dcy);
+    env(gn, t, 0.005, peak, dcy); o.connect(f); f.connect(gn); gn.connect(master);
+    if (toDelay) gn.connect(delay);
+    o.start(t); o.stop(t + dcy + 0.05);
+  }
+  function pad(t, chord, dur) {
+    for (const n of chord) for (const det of [-7, 7]) {
+      const o = ac.createOscillator(), f = ac.createBiquadFilter(), gn = ac.createGain();
+      o.type = 'sawtooth'; o.frequency.value = mtof(n); o.detune.value = det;
+      f.type = 'lowpass'; f.frequency.value = 1100;
+      gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.035, t + 0.4); gn.gain.linearRampToValueAtTime(0.0001, t + dur);
+      o.connect(f); f.connect(gn); gn.connect(master); o.start(t); o.stop(t + dur + 0.05);
+    }
+  }
+  function playStep(st, t) {
+    const i = st % 16, chord = PROG[Math.floor(st / 16) % 4];
+    if (i % 4 === 0) kick(t);
+    if (i === 4 || i === 12) noise(t, 'bandpass', 1800, 0.5, 0.18);
+    if (i % 2 === 1) noise(t, 'highpass', 8000, 0.18, 0.04);
+    if (i % 2 === 0) tone(t, chord[0] - 24 + (i % 4 === 2 ? 12 : 0), 'sawtooth', 0.35, S16 * 1.8, 900, false);
+    tone(t, chord[i % 3] + 12 + (i >= 8 ? 12 : 0), 'square', 0.07, S16 * 0.9, 3200, true);
+    if (i === 0) pad(t, chord, S16 * 16);
+  }
+  function scheduler() {
+    while (nextTime < ac.currentTime + 0.12) { playStep(step, nextTime); nextTime += S16; step++; }
+  }
+  const radioBtn = $('#radio');
+  radioBtn.addEventListener('click', async () => {
+    if (!ac) initAudio();
+    if (!playing) {
+      await ac.resume();
+      step = 0; startTime = nextTime = ac.currentTime + 0.05;
+      schedTimer = setInterval(scheduler, 25); playing = true;
+      radioBtn.setAttribute('aria-pressed', 'true'); radioBtn.textContent = 'Leonida FM · On air';
+    } else {
+      clearInterval(schedTimer); playing = false; await ac.suspend();
+      radioBtn.setAttribute('aria-pressed', 'false'); radioBtn.textContent = 'Tune in · Leonida FM';
+    }
+  });
+
+  /* ================= Cheats ================= */
+  let sirens = false, sirenTimer;
+  const wastedOv = $('#wastedOv');
+  const CHEATS = {
+    HESOYAM() { bonus += 250000; say('CHEAT ACTIVATED', 'Health, armor and $250,000.'); },
+    VICE() { const on = document.body.classList.toggle('vice'); say('CHEAT ACTIVATED', on ? 'Vice mode on.' : 'Back to sunset.'); },
+    SKYFALL() { warpTarget = 7; say('CHEAT ACTIVATED', 'Hyperdrive engaged.'); setTimeout(() => { warpTarget = 1; }, 6000); },
+    LEONIDA() { fireworks(8); say('CHEAT ACTIVATED', 'Happy launch season.'); },
+    KONAMI() {
+      sirens = true; lastWanted = ''; document.body.classList.add('wanted5');
+      say('WANTED LEVEL', 'Five stars. Lose the cops.');
+      clearTimeout(sirenTimer);
+      sirenTimer = setTimeout(() => { sirens = false; lastWanted = ''; document.body.classList.remove('wanted5'); }, 6000);
+    },
+    WASTED() { flashOverlay(wastedOv, 3200); }
+  };
+  document.querySelectorAll('[data-cheat]').forEach(b => b.addEventListener('click', () => CHEATS[b.dataset.cheat]()));
+
+  let typed = '';
+  const keys = [];
+  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input,textarea')) return;
+    keys.push(e.key.length === 1 ? e.key.toLowerCase() : e.key); if (keys.length > 10) keys.shift();
+    if (keys.join() === KONAMI.join()) { CHEATS.KONAMI(); keys.length = 0; return; }
+    if (/^[a-z]$/i.test(e.key)) {
+      typed = (typed + e.key.toUpperCase()).slice(-12);
+      for (const code of ['HESOYAM', 'VICE', 'SKYFALL', 'LEONIDA', 'WASTED'])
+        if (typed.endsWith(code)) { CHEATS[code](); typed = ''; break; }
+    }
+  });
+
+  /* ================= Misc ================= */
+  $('#share').addEventListener('click', () => {
+    navigator.clipboard.writeText(location.href)
+      .then(() => say('LINK COPIED', 'Send it to your crew.'))
+      .catch(() => say('COPY FAILED', location.href));
+  });
+
+  addEventListener('pointermove', e => { tmx = e.clientX / W * 2 - 1; tmy = e.clientY / H * 2 - 1; });
+  addEventListener('resize', resize);
+
+  function launch() {
+    launched = true;
+    const ov = $('#passedOv');
+    ov.classList.add('show');
+    ov.addEventListener('click', () => ov.classList.remove('show'), { once: true });
+    fireworks(14);
+    setInterval(() => fireworks(3), 5000);
+  }
+
+  const intro = $('#intro');
+  const hideIntro = () => { intro.classList.add('gone'); setTimeout(() => intro.remove(), 1100); };
+  if (!reduce) { setTimeout(hideIntro, 1900); intro.addEventListener('click', hideIntro, { once: true }); }
+
+  /* ================= Loop ================= */
+  resize();
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!reduce) T += dt;
+    mx += (tmx - mx) * 0.05; my += (tmy - my) * 0.05;
+    warp += (warpTarget - warp) * 0.04;
+    if (!reduce) gridT += dt * 0.55 * warp;
+
+    if (playing) {
+      const ph = ((ac.currentTime - startTime) / (S16 * 4)) % 1;
+      pulse = Math.pow(1 - ph, 3);
+    } else pulse *= 0.9;
+    root.style.setProperty('--beat', pulse.toFixed(3));
+
+    drawSky();
+    const sun = drawSun();
+    drawSkyline();
+    drawFloor(sun);
+    drawParticles(dt);
+    drawPalms();
+
+    countdown(Date.now());
+    money(now);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
